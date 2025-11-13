@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Ficticio Mejorado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      line-height: 1.6;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #timer {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Ficticio Mejorado (3 preguntas)</h1>
+  <div id="timer">Tiempo restante: 1:00</div>
+  <div id="quiz"></div>
+  <button onclick="submitQuiz()">Enviar respuestas</button>
+  <h2 id="result"></h2>
+  <button id="retry" onclick="retryQuiz()" style="display:none;">Repetir test</button>
+
+  <script>
+    const questions = [
+      {
+        text: "1. ¿Cuál es la temperatura habitual de un autoclave para esterilizar materiales?",
+        options: ["80 ºC", "121 ºC", "50 ºC", "200 ºC"],
+        answer: 1
+      },
+      {
+        text: "2. ¿Qué indica el manómetro del autoclave?",
+        options: ["La presión interna", "El nivel de agua", "La calidad del vapor", "La potencia eléctrica"],
+        answer: 0
+      },
+      {
+        text: "3. ¿Qué método utiliza el autoclave para esterilizar?",
+        options: ["Calor seco", "Radiación UV", "Vapor a presión", "Óxido de etileno"],
+        answer: 2
+      }
+    ];
+
+    const quizContainer = document.getElementById("quiz");
+    const timerElement = document.getElementById("timer");
+    let time = 60; // 60 segundos
+    let timerInterval;
+
+    function loadQuiz() {
+      quizContainer.innerHTML = '';
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+        let html = `<p><strong>${q.text}</strong></p>`;
+        q.options.forEach((opt, i) => {
+          html += `<label><input type="radio" name="q${index}" value="${i}" /> ${opt}</label><br />`;
+        });
+        div.innerHTML = html;
+        quizContainer.appendChild(div);
+      });
+      document.getElementById('result').textContent = '';
+      document.getElementById('retry').style.display = 'none';
+      startTimer();
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name='q${index}']:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+          score++;
+        }
+      });
+      document.getElementById("result").textContent = `Has acertado ${score} de ${questions.length} preguntas.`;
+      document.getElementById('retry').style.display = 'inline-block';
+    }
+
+    function retryQuiz() {
+      time = 60;
+      loadQuiz();
+    }
+
+    function startTimer() {
+      timerElement.textContent = `Tiempo restante: ${formatTime(time)}`;
+      timerInterval = setInterval(() => {
+        time--;
+        timerElement.textContent = `Tiempo restante: ${formatTime(time)}`;
+        if (time <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+      }, 1000);
+    }
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+      return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    loadQuiz();
+  </script>
+</body>
+</html>
